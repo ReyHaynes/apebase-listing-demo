@@ -1,7 +1,19 @@
 import type { NextPage } from 'next'
 import Head from 'next/head'
+import { useEffect } from 'react'
+import { NFT } from '../models/NFT'
 
 const Home: NextPage = () => {
+
+  useEffect(() => {
+    fetch('/api/nfts')
+      .then(async (res) => {
+        const nfts = await res.json() as NFT[]
+        console.log(nfts)
+      })
+  }, [])
+
+
   return (
     <div>
       <Head>
