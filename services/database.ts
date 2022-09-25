@@ -3,22 +3,27 @@ import { NFT } from '../models/NFT';
 
 export const db = new Datastore({ filename: "./lib/db", autoload: true });
 
-export const dbQuery = (q: object, page: number, pagination: number) => {
+export const dbQuery = (q: object, page: number, pagination: number, optimizeSize: boolean = true) => {
   return new Promise((resolve, reject) => {
     db.find(q).limit(pagination).skip(page * pagination)
       .exec((err: any, response: NFT[]) => {
-        // Reduce Data payload by 50%
-        const nfts: NFT[] = response.map((res => {
-          return {
-            id: res.id,
-            _id: res._id,
-            metadata: {
-              image: adjustImagePath(res.metadata.image),
-              attributes: res.metadata.attributes
+          // Reduce Client payload by 50%
+          if (optimizeSize) {
+          const nfts: NFT[] = response.map((res => {
+            return {
+              id: res.id,
+              metadata: {
+                image: adjustImagePath(res.metadata.image),
+                attributes: res.metadata.attributes
+              }
             }
-          }
-        }))
-        resolve(nfts)
+          }))
+          resolve(nfts)
+        }
+        else {
+          response.forEach(transformImage)
+          resolve(response)
+        }
       }
     )
   })
@@ -40,14 +45,14 @@ const adjustImagePath = (url: string) => {
   return url;
 }
 
-const transformImage = (doc: NFT) => {
-  if (doc.metadata.image.startsWith("Qm")) {
-    doc.metadata.image = "https://ipfs.io/ipfs/" + doc.metadata.image
-  } else if (doc.metadata.image.startsWith("/ipfs")) {
-    doc.metadata.image = "https://ipfs.io/ipfs/" + doc.metadata.image.slice(5)
-  } else if (doc.metadata.image.startsWith("ipfs://ipfs")) {
-    doc.metadata.image = "https://ipfs.io/ipfs/" + doc.metadata.image.slice(12)
-  } else if (doc.metadata.image.startsWith("ipfs://")) {
-    doc.metadata.image = "https://ipfs.io/ipfs/" + doc.metadata.image.slice(7)
+const transformImage = (data: NFT) => {
+  if (data.metadata.image.startsWith("Qm")) {
+    data.metadata.image = "https://ipfs.io/ipfs/" + data.metadata.image
+  } else if (data.metadata.image.startsWith("/ipfs")) {
+    data.metadata.image = "https://ipfs.io/ipfs/" + data.metadata.image.slice(5)
+  } else if (data.metadata.image.startsWith("ipfs://ipfs")) {
+    data.metadata.image = "https://ipfs.io/ipfs/" + data.metadata.image.slice(12)
+  } else if (data.metadata.image.startsWith("ipfs://")) {
+    data.metadata.image = "https://ipfs.io/ipfs/" + data.metadata.image.slice(7)
   }
 }

@@ -1,5 +1,4 @@
 export type NFT = {
-  _id: string
   id: string
   metadata: {
     image: string
