@@ -11,7 +11,7 @@ interface NFTCard {
 
 const NFTCard = ({ id, imageURL, imageDimension, isSelected, onNFTCardClick } : NFTCard) => {
   return (
-    <div className={`flex p-0.5 justify-self-center flex-col cursor-pointer rounded-lg max-w-[200px] transition ease-in-out duration-300 hover:bg-indigo-600 hover:text-white ${isSelected ? '!bg-emerald-500' : ''}`}
+    <div className={`flex p-0.5 justify-self-center flex-col cursor-pointer rounded-lg min-w-[75px] max-w-[200px] transition ease-in-out duration-300 hover:bg-indigo-600 hover:text-white ${isSelected ? '!bg-emerald-500' : ''}`}
       onClick={() => onNFTCardClick && onNFTCardClick()}>
       <Image src={imageURL} width={imageDimension} height={imageDimension} alt={id} />
       <div className='p-2 flex justify-center'>
